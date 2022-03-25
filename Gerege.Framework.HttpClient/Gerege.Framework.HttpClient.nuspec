@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<metadata>
+		<id>$id$</id>
+		<version>$version$</version>
+		<title>$title$</title>
+		<authors>$authors$</authors>
+		<projectUrl>https://www.gerege.mn/api/windows</projectUrl>
+		<readme>README.md</readme>
+		<icon>gerege-icon.png</icon>
+		<description>$description$</description>
+		<copyright>$copyright$</copyright>
+		<tags>gerege;client;httpclient</tags>
+		<dependencies>
+			<dependency id="Newtonsoft.Json" version="13.0.1" />
+            <dependency id="Gerege.Framework.Logger" version="5.0.2" />
+            <dependency id="Gerege.Framework.FileSystem" version="5.0.1" />
+        </dependencies>
+	</metadata>
+	<files>
+		<file src=".\README.md" target="\" />
+		<file src="$targetdir$..\..\..\gerege-icon.png" target="\" />
+	</files>
+</package>
