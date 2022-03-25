@@ -5,7 +5,7 @@
 		<version>$version$</version>
 		<title>$title$</title>
 		<authors>$authors$</authors>
-		<projectUrl>https://www.gerege.mn/api/windows</projectUrl>
+		<projectUrl>https://github.com/Gerege-Systems/Gerege.Framework.HttpClient</projectUrl>
 		<readme>README.md</readme>
 		<icon>gerege-icon.png</icon>
 		<description>$description$</description>
@@ -13,8 +13,8 @@
 		<tags>gerege;client;httpclient</tags>
 		<dependencies>
 			<dependency id="Newtonsoft.Json" version="13.0.1" />
-            <dependency id="Gerege.Framework.Logger" version="5.0.2" />
-            <dependency id="Gerege.Framework.FileSystem" version="5.0.1" />
+            <dependency id="Gerege.Framework.Logger" version="5.0.3" />
+            <dependency id="Gerege.Framework.FileSystem" version="5.0.2" />
         </dependencies>
 	</metadata>
 	<files>
