@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>gerege-win.ico</ApplicationIcon>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Version>5.0.4</Version>
+    <Version>5.0.5</Version>
     <Authors>Гэрэгэ Системс ХХК</Authors>
     <Description>Gerege Application Development Framework - HttpClient library</Description>
     <Copyright>Gerege Systems LLC</Copyright>
@@ -23,8 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gerege.Framework.FileSystem" Version="5.0.2" />
-    <PackageReference Include="Gerege.Framework.Logger" Version="5.0.3" />
+    <PackageReference Include="Gerege.Framework.Logger" Version="5.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-using Gerege.Framework.FileSystem;
-
 namespace Gerege.Framework.HttpClient
 {
     /// <author>
@@ -198,6 +196,9 @@ namespace Gerege.Framework.HttpClient
             );
         }
 
+        /// <summary>Cache хүсэлтийн хариу файлуудыг хадгалах хавтас зам.</summary>
+        public string? CachePath { get; set; } = null;
+
         /// <summary>
         /// HTTP хүсэлт үүсгэж илгээн мэдээлэл хүлээж авах.
         /// Амжилттай биелсэн хүсэлтийн хариуг cache-д хадгална. 
@@ -219,7 +220,7 @@ namespace Gerege.Framework.HttpClient
         /// </returns>
         public virtual T CacheRequest<T>(dynamic? payload = null, HttpMethod? method = null, string? requestUri = null)
         {
-            CacheFile cache = new(GetMessageCode<T>(), payload);
+            GeregeCache cache = new(GetMessageCode<T>(), payload, CachePath);
             try
             {
                 return cache.Load<T>();
