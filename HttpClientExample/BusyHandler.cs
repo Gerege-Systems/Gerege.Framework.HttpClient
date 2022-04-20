@@ -23,7 +23,7 @@ namespace HttpClientExample
         {
             this.App().Busy = value;
             
-            Debug.WriteLine("Application " + (value ? "завгүй" : "завтай") + " боллоо.");
+            Debug.WriteLine("[BUSYHANDLER] Application " + (value ? "завгүй" : "завтай") + " боллоо.");
         }
 
         /// <inheritdoc />

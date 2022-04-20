@@ -1,44 +1,76 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <ApplicationIcon>gerege-win.ico</ApplicationIcon>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Version>5.0.5</Version>
-    <Authors>Гэрэгэ Системс ХХК</Authors>
-    <Description>Gerege Application Development Framework - HttpClient library</Description>
-    <Copyright>Gerege Systems LLC</Copyright>
-    <PackageProjectUrl>https://github.com/Gerege-Systems/Gerege.Framework.HttpClient</PackageProjectUrl>
-    <PackageIcon>gerege-icon.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>gerege;framework;client;httpclient</PackageTags>
-    <NeutralLanguage>mn-MN</NeutralLanguage>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{51F55B71-6DCA-4E5E-B57A-6FF6785A463B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Gerege.Framework.HttpClient</RootNamespace>
+    <AssemblyName>Gerege.Framework.HttpClient</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
-
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Gerege.Framework.HttpClient.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Gerege.Framework.HttpClient.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>gerege-win.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <None Include="gerege-icon.png" />
     <Content Include="gerege-win.ico" />
+    <None Include="nuget.exe" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Gerege.Framework.Logger" Version="5.0.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <Compile Include="GeregeCache.cs" />
+    <Compile Include="GeregeClient.cs" />
+    <Compile Include="GeregeResponse.cs" />
+    <Compile Include="GeregeToken.cs" />
+    <Compile Include="LoggingHandler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RetryHandler.cs" />
   </ItemGroup>
-
   <ItemGroup>
-    <None Update="gerege-icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Update="nuget.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+    <Reference Include="Gerege.Framework.Logger, Version=5.4.7.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Gerege.Framework.Logger.5.4.7.2\lib\net472\Gerege.Framework.Logger.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Security" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="Gerege.Framework.HttpClient.nuspec" />
+    <None Include="packages.config" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

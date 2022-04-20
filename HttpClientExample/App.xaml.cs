@@ -2,7 +2,6 @@
 using System.Net.Http;
 
 #pragma warning disable IDE0060
-#pragma warning disable CS8603
 namespace HttpClientExample
 {
     /// <summary>
@@ -23,4 +22,3 @@ namespace HttpClientExample
     }
 }
 #pragma warning restore IDE0060
-#pragma warning restore CS8603

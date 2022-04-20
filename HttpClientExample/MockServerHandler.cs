@@ -20,12 +20,12 @@ namespace HttpClientExample
             {
                 Thread.Sleep(500); // Интернетээр хандаж буй мэт сэтгэгдэл төрүүлэх үүднээс хором хүлээлгэе
 
-                string? requestTarget = request.RequestUri?.ToString();
+                string requestTarget = request.RequestUri?.ToString();
                 if (requestTarget != "http://mock-server/api")
                     throw new Exception("Unknown route pattern [" + requestTarget + "]");
 
-                Task<string>? input = request.Content?.ReadAsStringAsync(cancellationToken);
-                dynamic? payload = JsonConvert.DeserializeObject(input?.Result!);
+                Task<string> input = request.Content?.ReadAsStringAsync();
+                dynamic payload = JsonConvert.DeserializeObject(input?.Result);
 
                 return HandleMessages(payload);
             }
@@ -51,7 +51,7 @@ namespace HttpClientExample
             });
         }
 
-        private Task<HttpResponseMessage> HandleMessages(dynamic? payload)
+        private Task<HttpResponseMessage> HandleMessages(dynamic payload)
         {
             if (payload?.get == null)
                 throw new Exception("Invalid payload");

@@ -4,7 +4,7 @@
 		<id>$id$</id>
 		<version>$version$</version>
 		<title>$title$</title>
-		<authors>$authors$</authors>
+		<authors>$author$</authors>
 		<projectUrl>https://github.com/Gerege-Systems/Gerege.Framework.HttpClient</projectUrl>
 		<readme>README.md</readme>
 		<icon>gerege-icon.png</icon>
@@ -12,12 +12,15 @@
 		<copyright>$copyright$</copyright>
 		<tags>gerege;client;httpclient</tags>
 		<dependencies>
-			<dependency id="Newtonsoft.Json" version="13.0.1" />
-            <dependency id="Gerege.Framework.Logger" version="5.0.4" />
-        </dependencies>
+			<group targetFramework=".NETFramework4.7.2" />
+			<group>
+				<dependency id="Newtonsoft.Json" version="13.0.1" />
+				<dependency id="Gerege.Framework.Logger" version="5.4.7.2" />
+			</group>
+		</dependencies>
 	</metadata>
 	<files>
 		<file src=".\README.md" target="\" />
-		<file src="$targetdir$..\..\..\gerege-icon.png" target="\" />
+		<file src=".\gerege-icon.png" target="\" />
 	</files>
 </package>

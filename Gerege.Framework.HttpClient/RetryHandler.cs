@@ -37,16 +37,18 @@ namespace Gerege.Framework.HttpClient
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             int tryCount = -1;
-            Exception? lastError = null;
+            Exception errorOccurs = null;
             while (true)
             {
                 tryCount++;
                 if (MaxTries == tryCount)
                 {
                     // За надад бол хийж чадах зүйл үлдсэнгүй хэлсэн тоогоор чинь оролдлоошдээ,
-                    // хамгийн сүүлчийн оролдлогоор алдаа гарсан байгаа бол хүлээн авагчруу мэдээлнэ
+                    // оролдлого хийх явцад ямар нэг алдаа гарсан байгаа бол хүлээн авагчруу мэдээлнэ
                     // эсвэл одоо null утга буцаахаас даа
-                    return lastError != null ? throw lastError : null!;
+                    if (errorOccurs is null) return null;
+
+                    throw errorOccurs;
                 }
 
                 try
@@ -77,7 +79,7 @@ namespace Gerege.Framework.HttpClient
                 catch (Exception ex)
                 {
                     // илэрсэн алдааг түр хадгалъя
-                    lastError = ex;
+                    errorOccurs = ex;
 
                     if (IsNetworkError(ex))
                     {

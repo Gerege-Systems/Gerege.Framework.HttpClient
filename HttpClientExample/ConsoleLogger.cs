@@ -19,7 +19,7 @@ namespace HttpClientExample
     public class ConsoleLogger : DatabaseLogger
     {
         /// <inheritdoc />
-        public override bool Connect(string? connection = null)
+        public override bool Connect(string connection = null)
         {
             return true;
         }
@@ -34,8 +34,16 @@ namespace HttpClientExample
         protected override void Log(string table, string level, string message, dynamic context)
         {
             string log =
-                "[" + GetType().Name.ToUpper() + "] Me writing log in " + level + " to " + table
-                + " : message => \"" + message + "\" and context => " + Convert.ToString(context);
+                "["
+                + GetType().Name.ToUpper()
+                + "] Me writing log in "
+                + level
+                + " to "
+                + table
+                + " : message => \""
+                + message
+                + "\" and context => "
+                + Convert.ToString(context);
 
             Debug.WriteLine(log);
         }

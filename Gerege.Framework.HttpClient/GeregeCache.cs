@@ -2,18 +2,19 @@
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Diagnostics;
 using System.Security.Cryptography;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-#pragma warning disable CS8604
 namespace Gerege.Framework.HttpClient
 {
     /// <author>
     /// codesaur - 2019.11.02
     /// codesaur - 2020.12.11 - update
     /// codesaur - 2022.02.10 - update
+    /// codesaur - 2022.04.20 - update
     /// </author>
     /// <package>
     /// Gerege Application Development Framework V5
@@ -27,7 +28,7 @@ namespace Gerege.Framework.HttpClient
         /// <summary>
         /// Cache файлын нэр зам.
         /// </summary>
-        public string? FilePath = null;
+        public string FilePath = null;
 
         /// <summary>
         /// Cache файл обьект үүсгэх байгуулагч.
@@ -35,7 +36,7 @@ namespace Gerege.Framework.HttpClient
         /// <param name="msg">Мэдээллийн мессеж дугаар.</param>
         /// <param name="payload">Мэдээллийн хүсэлтийн бие.</param>
         /// <param name="folderPath">Файл хадгалагдах хавтасны зам.</param>
-        public GeregeCache(int msg, dynamic? payload = null, string? folderPath = null)
+        public GeregeCache(int msg, dynamic payload = null, string folderPath = null)
         {
             try
             {
@@ -43,12 +44,9 @@ namespace Gerege.Framework.HttpClient
                 if (string.IsNullOrEmpty(folderPath))
                 {
                     // Хэрэглэгчээс cache хадгалах хавтас замыг заагаагүй бол 
-                    // App идэвхитэй ажиллаж байгаа хавтас дотор Cache нэртэй фолдер сонгоё
-                    DirectoryInfo? currentDir = null;
-                    if (Environment.ProcessPath != null)
-                        currentDir = Directory.GetParent(Environment.ProcessPath);
-                    if (currentDir == null)
-                        currentDir = new DirectoryInfo(Environment.CurrentDirectory);
+                    // App оршиж байгаа хавтас дотор Cache нэртэй фолдер сонгоё
+                    DirectoryInfo currentDir = Directory.GetParent(
+                        Process.GetCurrentProcess().MainModule.FileName);
                     folderPath = $"{currentDir.FullName}{slash}Cache";
                 }
                 string filePath = $"{folderPath}{slash}[{msg}]";
@@ -62,7 +60,7 @@ namespace Gerege.Framework.HttpClient
                 }
                 filePath += ".json";
 
-                FileInfo fi = new(filePath);
+                FileInfo fi = new FileInfo(filePath);
                 if (fi.Directory != null
                     && !fi.Directory.Exists
                     && fi.DirectoryName != null)
@@ -91,12 +89,16 @@ namespace Gerege.Framework.HttpClient
         {
             if (!Exists()) throw new Exception("Cache байдгүй шүү. Яахуу найзаа?");
 
-            using StreamReader r = new(FilePath);
+            using (StreamReader r = new StreamReader(FilePath))
+            {
+                string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
 
-            string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
+                dynamic response = JsonConvert.DeserializeObject(fileDataDecrypted);
 
-            var response = JsonConvert.DeserializeObject(fileDataDecrypted);
-            return response ?? throw new Exception(FilePath + ": Null cache!");
+                if (response is null) throw new Exception(FilePath + ": Null result!");
+
+                return response;
+            }
         }
 
         /// <summary>
@@ -111,12 +113,16 @@ namespace Gerege.Framework.HttpClient
         {
             if (!Exists()) throw new Exception(FilePath + ": Cache байдгүй шүү. Яахуу найзаа?");
 
-            using StreamReader r = new(FilePath);
+            using (StreamReader r = new StreamReader(FilePath))
+            {
+                string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
 
-            string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
+                dynamic response = JsonConvert.DeserializeObject<T>(fileDataDecrypted);
 
-            T? response = JsonConvert.DeserializeObject<T>(fileDataDecrypted);
-            return response ?? throw new Exception(FilePath + ": Null cache!");
+                if (response is null) throw new Exception(FilePath + ": Null result!");
+                
+                return response;
+            }
         }
 
         /// <summary>
@@ -152,4 +158,3 @@ namespace Gerege.Framework.HttpClient
         }
     }
 }
-#pragma warning restore CS8604

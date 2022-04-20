@@ -18,7 +18,7 @@ namespace Gerege.Framework.HttpClient
     {
         /// <summary>Токен утга.</summary>
         [JsonProperty("token", Required = Required.Always)]
-        public string? Value { get; internal set; }
+        public string Value { get; internal set; }
 
         /// <summary>Токен дуусах хүртэлх хүчинтэй огноо.</summary>
         [JsonProperty("expires", Required = Required.Always)]
@@ -45,7 +45,7 @@ namespace Gerege.Framework.HttpClient
         /// <param name="value">Токен утга.</param>
         /// <param name="expires">Токен дуусах хүртэлх хүчинтэй хугацаа.</param>
         /// <param name="life_seconds">Токен хүчинтэй хугацаа секундээр.</param>
-        public void Update(string? value, DateTime expires, int life_seconds)
+        public void Update(string value, DateTime expires, int life_seconds)
         {
             Value = value;
             ExpireDate = expires;
