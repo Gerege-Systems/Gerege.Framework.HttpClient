@@ -73,25 +73,25 @@ namespace Gerege.Framework.HttpClient
         /// <remarks>
         /// <code>
         /// // override code sample
-        /// GeregeToken currentToken = null;
-        /// dynamic fetchTokenPayload = null;
+        /// GeregeToken _currentToken = null;
+        /// dynamic _fetchTokenPayload = null;
         /// 
         /// protected override GeregeToken FetchToken(dynamic payload = null)
         /// {
         ///      if (payload != null)
-        ///         fetchTokenPayload = payload;
+        ///         _fetchTokenPayload = payload;
         ///         
-        ///      if (currentToken != null
-        ///         AND currentToken.IsExpiring)
+        ///      if (_currentToken != null
+        ///         AND _currentToken.IsExpiring)
         ///      {
-        ///         currentToken = null;
-        ///         payload = fetchTokenPayload;
+        ///         _currentToken = null;
+        ///         payload = _fetchTokenPayload;
         ///      }
         ///      
         ///     if (payload != null)
-        ///         currentToken = RequestSampleToken(payload);
+        ///         _currentToken = RequestSampleToken(payload);
         ///         
-        ///     return currentToken;
+        ///     return _currentToken;
         /// }
         /// </code>
         /// </remarks>
