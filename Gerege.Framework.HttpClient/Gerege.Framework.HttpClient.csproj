@@ -6,6 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{51F55B71-6DCA-4E5E-B57A-6FF6785A463B}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <LangVersion>8.0</LangVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Gerege.Framework.HttpClient</RootNamespace>
     <AssemblyName>Gerege.Framework.HttpClient</AssemblyName>
