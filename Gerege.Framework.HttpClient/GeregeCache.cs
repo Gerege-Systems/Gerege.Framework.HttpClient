@@ -28,7 +28,7 @@ namespace Gerege.Framework.HttpClient
         /// <summary>
         /// Cache файлын нэр зам.
         /// </summary>
-        public string FilePath = null;
+        public string? FilePath = null;
 
         /// <summary>
         /// Cache файл обьект үүсгэх байгуулагч.
@@ -36,7 +36,7 @@ namespace Gerege.Framework.HttpClient
         /// <param name="msg">Мэдээллийн мессеж дугаар.</param>
         /// <param name="payload">Мэдээллийн хүсэлтийн бие.</param>
         /// <param name="folderPath">Файл хадгалагдах хавтасны зам.</param>
-        public GeregeCache(int msg, dynamic payload = null, string folderPath = null)
+        public GeregeCache(int msg, dynamic? payload = null, string? folderPath = null)
         {
             try
             {
@@ -49,8 +49,10 @@ namespace Gerege.Framework.HttpClient
                         Process.GetCurrentProcess().MainModule.FileName);
                     folderPath = $"{currentDir.FullName}{slash}Cache";
                 }
+                
                 string filePath = $"{folderPath}{slash}[{msg}]";
-                if (payload != null)
+                
+                if (payload is not null)
                 {
                     JObject jobj = JObject.FromObject(payload);
 
@@ -60,7 +62,7 @@ namespace Gerege.Framework.HttpClient
                 }
                 filePath += ".json";
 
-                FileInfo fi = new FileInfo(filePath);
+                FileInfo fi = new(filePath);
                 if (fi.Directory != null
                     && !fi.Directory.Exists
                     && fi.DirectoryName != null)
@@ -87,18 +89,16 @@ namespace Gerege.Framework.HttpClient
         /// </returns>
         public dynamic Load()
         {
-            if (!Exists()) throw new Exception("Cache байдгүй шүү. Яахуу найзаа?");
+            if (!Exists()) throw new("Cache байдгүй шүү. Яахуу найзаа?");
 
-            using (StreamReader r = new StreamReader(FilePath))
-            {
-                string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
+            using StreamReader r = new(FilePath);
+            string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
 
-                dynamic response = JsonConvert.DeserializeObject(fileDataDecrypted);
+            dynamic? response = JsonConvert.DeserializeObject(fileDataDecrypted);
 
-                if (response is null) throw new Exception(FilePath + ": Null result!");
+            if (response is null) throw new(FilePath + ": Null result!");
 
-                return response;
-            }
+            return response;
         }
 
         /// <summary>
@@ -111,18 +111,16 @@ namespace Gerege.Framework.HttpClient
         /// </returns>
         public T Load<T>()
         {
-            if (!Exists()) throw new Exception(FilePath + ": Cache байдгүй шүү. Яахуу найзаа?");
+            if (!Exists()) throw new(FilePath + ": Cache байдгүй шүү. Яахуу найзаа?");
 
-            using (StreamReader r = new StreamReader(FilePath))
-            {
-                string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
+            using StreamReader r = new(FilePath);
+            string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
 
-                dynamic response = JsonConvert.DeserializeObject<T>(fileDataDecrypted);
+            dynamic? response = JsonConvert.DeserializeObject<T>(fileDataDecrypted);
 
-                if (response is null) throw new Exception(FilePath + ": Null result!");
-                
-                return response;
-            }
+            if (response is null) throw new(FilePath + ": Null result!");
+
+            return response;
         }
 
         /// <summary>
@@ -132,7 +130,7 @@ namespace Gerege.Framework.HttpClient
         public bool Create(dynamic data)
         {
             if (string.IsNullOrEmpty(FilePath))
-                throw new Exception("Cache тохируулга буруу хийгдсэн байна!");
+                throw new("Cache тохируулга буруу хийгдсэн байна!");
 
             if (Exists()) File.Delete(FilePath);
 

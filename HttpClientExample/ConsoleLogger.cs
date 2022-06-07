@@ -19,7 +19,7 @@ namespace HttpClientExample
     public class ConsoleLogger : DatabaseLogger
     {
         /// <inheritdoc />
-        public override bool Connect(string connection = null)
+        public override bool Connect(string? connection = null)
         {
             return true;
         }

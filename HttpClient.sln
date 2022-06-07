@@ -1,4 +1,7 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientExample", "HttpClientExample\HttpClientExample.csproj", "{EB13863D-6278-48F5-A291-EEA9674AC0F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gerege.Framework.HttpClient", "Gerege.Framework.HttpClient\Gerege.Framework.HttpClient.csproj", "{51F55B71-6DCA-4E5E-B57A-6FF6785A463B}"

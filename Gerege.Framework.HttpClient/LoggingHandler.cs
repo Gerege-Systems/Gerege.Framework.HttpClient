@@ -49,7 +49,7 @@ namespace Gerege.Framework.HttpClient
                     || request.Method != HttpMethod.Post) id += message_code + "_";
 
                 // Илгээж буй хүсэлтийн мэдээллийг логын хэвийн түвшинд хадгалъяа
-                _db_logger.Notice("http", id + "request", await request.Content?.ReadAsStringAsync());
+                _db_logger.Notice("http", id + "request", await request.Content.ReadAsStringAsync());
 
                 // base.SendAsync нь голын боловсруулагчийг ажиллуулж байна
                 var response = await base.SendAsync(request, cancellationToken);

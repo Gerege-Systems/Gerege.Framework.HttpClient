@@ -9,7 +9,7 @@ namespace HttpClientExample
     {
         public SampleClient(HttpMessageHandler handler) : base(handler)
         {
-            BaseAddress = new Uri("http://mock-server/api");
+            BaseAddress = new("http://mock-server/api");
         }
     }
 }

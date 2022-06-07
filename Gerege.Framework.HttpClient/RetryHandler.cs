@@ -33,11 +33,11 @@ namespace Gerege.Framework.HttpClient
         }
 
         /// <inheritdoc />
-        protected override async Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage?> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             int tryCount = -1;
-            Exception errorOccurs = null;
+            Exception? errorOccurs = null;
             while (true)
             {
                 tryCount++;
@@ -97,10 +97,12 @@ namespace Gerege.Framework.HttpClient
             // Сүлжээний алдаа?
             if (ex is SocketException)
                 return true;
-            if (ex.InnerException != null)
-                return IsNetworkError(ex.InnerException);
 
-            return false;
+            // нягтлах өөр ямар нэг алдаа гараагүй?
+            if (ex.InnerException is null)
+                return false;
+            
+            return IsNetworkError(ex.InnerException);
         }
     }
 }

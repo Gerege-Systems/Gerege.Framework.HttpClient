@@ -37,7 +37,7 @@ namespace HttpClientExample
                     }
                 }
             };
-            Client = new SampleClient(pipeline);
+            Client = new(pipeline);
         }
 
         public struct Welcome

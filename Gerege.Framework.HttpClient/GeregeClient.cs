@@ -26,7 +26,7 @@ namespace Gerege.Framework.HttpClient
     public abstract class GeregeClient : System.Net.Http.HttpClient
     {
         /// <summary>Серверээс хамгийн сүүлд авсан гэрэгэ хариу.</summary>
-        public GeregeResponse HttpLastResponse { get; set; } = null;
+        public GeregeResponse? HttpLastResponse { get; set; } = null;
 
         /// <inheritdoc />
         public GeregeClient(HttpMessageHandler handler) : base(handler)
@@ -51,17 +51,17 @@ namespace Gerege.Framework.HttpClient
         {
             Type type = typeof(T);
 
-            object instanceOfType = Activator.CreateInstance(type);
+            object? instanceOfType = Activator.CreateInstance(type);
             if (instanceOfType is null)
-                throw new Exception(GetType().Name + ": Error on GetMessageCode<T> -> Invalid type!");
+                throw new(GetType().Name + ": Error on GetMessageCode<T> -> Invalid type!");
 
-            MethodInfo geregeMessage = type.GetMethod("GeregeMessage");
+            MethodInfo? geregeMessage = type.GetMethod("GeregeMessage");
             if (geregeMessage is null)
-                throw new Exception(GetType().Name + ": Error on GetMessageCode<T> -> Unknown Gerege message!");
+                throw new(GetType().Name + ": Error on GetMessageCode<T> -> Unknown Gerege message!");
 
             object resultCode = geregeMessage.Invoke(instanceOfType, Array.Empty<object>());
             return resultCode is int @int ? @int :
-                throw new Exception(GetType().Name + ": Error on GetMessageCode<T> -> Invalid Gerege message defination!");
+                throw new(GetType().Name + ": Error on GetMessageCode<T> -> Invalid Gerege message defination!");
         }
 
         /// <summary>
@@ -73,22 +73,22 @@ namespace Gerege.Framework.HttpClient
         /// <remarks>
         /// <code>
         /// // override code sample
-        /// GeregeToken _currentToken = null;
-        /// dynamic _fetchTokenPayload = null;
+        /// GeregeToken? _currentToken = null;
+        /// dynamic? _fetchTokenPayload = null;
         /// 
-        /// protected override GeregeToken FetchToken(dynamic payload = null)
+        /// protected override GeregeToken? FetchToken(dynamic? payload = null)
         /// {
-        ///      if (payload != null)
+        ///      if (payload is not null)
         ///         _fetchTokenPayload = payload;
         ///         
-        ///      if (_currentToken != null
+        ///      if (_currentToken is not null
         ///         AND _currentToken.IsExpiring)
         ///      {
         ///         _currentToken = null;
         ///         payload = _fetchTokenPayload;
         ///      }
         ///      
-        ///     if (payload != null)
+        ///     if (payload is not null)
         ///         _currentToken = RequestSampleToken(payload);
         ///         
         ///     return _currentToken;
@@ -104,7 +104,7 @@ namespace Gerege.Framework.HttpClient
         /// <returns>
         /// RFC 6750 Bearer Token | null.
         /// </returns>
-        protected virtual GeregeToken FetchToken(dynamic payload = null)
+        protected virtual GeregeToken? FetchToken(dynamic? payload = null)
         {
             return null;
         }
@@ -123,14 +123,14 @@ namespace Gerege.Framework.HttpClient
         /// <returns>
         /// Амжилттай байгуулсан хүсэлтийг буцаана.
         /// </returns>
-        protected virtual HttpRequestMessage CreateRequest<T>(string requestUri, HttpMethod method = null, dynamic payload = null)
+        protected virtual HttpRequestMessage CreateRequest<T>(string? requestUri, HttpMethod? method = null, dynamic? payload = null)
         {
             if (string.IsNullOrEmpty(requestUri))
-                throw new Exception(GetType().Name + ": Error on CreateRequest<T> -> Must be set requestUri or BaseAddress!");
+                throw new(GetType().Name + ": Error on CreateRequest<T> -> Must be set requestUri or BaseAddress!");
 
             var request = new HttpRequestMessage
             {
-                RequestUri = new Uri(requestUri),
+                RequestUri = new(requestUri),
                 Method = method ?? HttpMethod.Post,
                 Content = new StringContent(JsonConvert.SerializeObject(payload))
             };
@@ -138,8 +138,8 @@ namespace Gerege.Framework.HttpClient
             int msg = GetMessageCode<T>();
             request.Headers.Add("message_code", Convert.ToString(msg));
 
-            GeregeToken token = FetchToken();
-            if (!string.IsNullOrEmpty(token?.Value))
+            GeregeToken? token = FetchToken();
+            if (token is not null && !string.IsNullOrEmpty(token.Value))
                 request.Headers.Add(HttpRequestHeader.Authorization.ToString(), "Bearer " + token.Value);
 
             return request;
@@ -164,7 +164,7 @@ namespace Gerege.Framework.HttpClient
         /// <returns>
         /// Серверээс ирсэн хариуг амжилттай авч тухайн зарласан T темплейт класс обьектэд хөрвүүлсэн утгыг буцаана.
         /// </returns>
-        public virtual T Request<T>(dynamic payload = null, HttpMethod method = null, string requestUri = null)
+        public virtual T Request<T>(dynamic? payload = null, HttpMethod? method = null, string? requestUri = null)
         {
             HttpLastResponse = null;
 
@@ -175,14 +175,14 @@ namespace Gerege.Framework.HttpClient
                 return await responsMessage.Content.ReadAsStringAsync();
             }).Result;
 
-            dynamic content = JsonConvert.DeserializeObject(contentString);
+            dynamic? content = JsonConvert.DeserializeObject(contentString);
             if (content is null)
-                throw new Exception(GetType().Name + ": Error on Request<T> -> Invalid JSON response! response.content: " + contentString);
+                throw new(GetType().Name + ": Error on Request<T> -> Invalid JSON response! response.content: " + contentString);
 
             if (content.code is null || content.status is null)
-                throw new Exception(GetType().Name + ": Error on Request<T> -> Invalid Gerege response! response.content: " + contentString);
+                throw new(GetType().Name + ": Error on Request<T> -> Invalid Gerege response! response.content: " + contentString);
 
-            HttpLastResponse = new GeregeResponse(
+            HttpLastResponse = new(
                 Convert.ToInt32(content.code),
                 Convert.ToString(content.status),
                 Convert.ToString(content.message ?? "Empty message"),
@@ -190,7 +190,7 @@ namespace Gerege.Framework.HttpClient
             );
 
             if (!HttpLastResponse.IsSuccess)
-                throw new Exception(HttpLastResponse.Message);
+                throw new(HttpLastResponse.Message);
 
             return JsonConvert.DeserializeObject<T>(
                 JsonConvert.SerializeObject(HttpLastResponse.Result),
@@ -199,7 +199,7 @@ namespace Gerege.Framework.HttpClient
         }
 
         /// <summary>Cache хүсэлтийн хариу файлуудыг хадгалах хавтас зам.</summary>
-        public string CachePath { get; set; } = null;
+        public string? CachePath { get; set; } = null;
 
         /// <summary>
         /// HTTP хүсэлт үүсгэж илгээн мэдээлэл хүлээж авах.
@@ -220,9 +220,9 @@ namespace Gerege.Framework.HttpClient
         /// <returns>
         /// Серверээс ирсэн хариуг амжилттай авсан эсвэл Cache дээрээс амжилттай уншсан мэдээллийг тухайн зарласан T темплейт класс обьектэд хөрвүүлсэн утгыг буцаана
         /// </returns>
-        public virtual T CacheRequest<T>(dynamic payload = null, HttpMethod method = null, string requestUri = null)
+        public virtual T CacheRequest<T>(dynamic? payload = null, HttpMethod? method = null, string? requestUri = null)
         {
-            var cache = new GeregeCache(GetMessageCode<T>(), payload, CachePath);
+            GeregeCache cache = new(GetMessageCode<T>(), payload, CachePath);
             try
             {
                 return cache.Load<T>();

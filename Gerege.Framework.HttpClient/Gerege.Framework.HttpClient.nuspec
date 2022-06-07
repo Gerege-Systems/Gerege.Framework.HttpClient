@@ -14,7 +14,7 @@
 		<dependencies>
 			<group targetFramework=".NETFramework4.7.2">
 				<dependency id="Newtonsoft.Json" version="13.0.1" />
-				<dependency id="Gerege.Framework.Logger" version="5.4.7.2" />
+				<dependency id="Gerege.Framework.Logger" version="5.5.0" />
 			</group>
 		</dependencies>
 	</metadata>
