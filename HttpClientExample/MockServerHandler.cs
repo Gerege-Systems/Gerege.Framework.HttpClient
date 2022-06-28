@@ -1,74 +1,76 @@
-﻿using System;
+﻿namespace HttpClientExample;
+
+/////// date: 2022.01.29 //////////
+///// author: Narankhuu ///////////
+//// contact: codesaur@gmail.com //
+
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Newtonsoft.Json;
 
-namespace HttpClientExample
+/// <summary>
+/// Туршилтын зорилгоор хуурамч сервер хандалт үүсгэв
+/// </summary>
+public sealed class MockServerHandler : HttpMessageHandler
 {
-    /// <summary>
-    /// Туршилтын зорилгоор хуурамч сервер хандалт үүсгэв
-    /// </summary>
-    public sealed class MockServerHandler : HttpMessageHandler
+    protected sealed override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        protected sealed override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, CancellationToken cancellationToken)
+        try
         {
-            try
-            {
-                Thread.Sleep(500); // Интернетээр хандаж буй мэт сэтгэгдэл төрүүлэх үүднээс хором хүлээлгэе
+            Thread.Sleep(500); // Интернетээр хандаж буй мэт сэтгэгдэл төрүүлэх үүднээс хором хүлээлгэе
 
-                string requestTarget = request.RequestUri.ToString();
-                if (requestTarget != "http://mock-server/api")
-                    throw new("Unknown route pattern [" + requestTarget + "]");
+            string requestTarget = request.RequestUri.ToString();
+            if (requestTarget != "http://mock-server/api")
+                throw new("Unknown route pattern [" + requestTarget + "]");
 
-                Task<string> input = request.Content.ReadAsStringAsync();
-                dynamic? payload = JsonConvert.DeserializeObject(input.Result);
+            Task<string> input = request.Content.ReadAsStringAsync();
+            dynamic? payload = JsonConvert.DeserializeObject(input.Result);
 
-                return HandleMessages(payload);
-            }
-            catch (Exception ex)
-            {
-                return Respond(new
-                {
-                    code = 404,
-                    status = "Error 404",
-                    message = ex.Message,
-                    result = new { }
-                },
-                HttpStatusCode.NotFound);
-            }
+            return HandleMessages(payload);
         }
-
-        private Task<HttpResponseMessage> Respond(dynamic content, HttpStatusCode StatusCode = HttpStatusCode.OK)
+        catch (Exception ex)
         {
-            return Task.FromResult(new HttpResponseMessage()
+            return Respond(new
             {
-                StatusCode = StatusCode,
-                Content = new StringContent(JsonConvert.SerializeObject(content))
+                code = 404,
+                status = "Error 404",
+                message = ex.Message,
+                result = new { }
+            },
+            HttpStatusCode.NotFound);
+        }
+    }
+
+    private Task<HttpResponseMessage> Respond(dynamic content, HttpStatusCode StatusCode = HttpStatusCode.OK)
+    {
+        return Task.FromResult(new HttpResponseMessage()
+        {
+            StatusCode = StatusCode,
+            Content = new StringContent(JsonConvert.SerializeObject(content))
+        });
+    }
+
+    private Task<HttpResponseMessage> HandleMessages(dynamic? payload)
+    {
+        if (payload?.get is null)
+            throw new("Invalid payload");
+
+        if (Convert.ToString(payload.get) == "title")
+            return Respond(new
+            {
+                code = 200,
+                status = "success",
+                message = "",
+                result = new
+                {
+                    title = "Gerege System-д тавтай морил"
+                }
             });
-        }
-
-        private Task<HttpResponseMessage> HandleMessages(dynamic? payload)
-        {
-            if (payload?.get is null)
-                throw new("Invalid payload");
-
-            if (Convert.ToString(payload.get) == "title")
-                return Respond(new
-                {
-                    code = 200,
-                    status = "success",
-                    message = "",
-                    result = new
-                    {
-                        title = "Gerege System-д тавтай морил"
-                    }
-                });
-            
-            throw new("Unknown message");
-        }
+        
+        throw new("Unknown message");
     }
 }

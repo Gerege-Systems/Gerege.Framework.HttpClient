@@ -1,71 +1,72 @@
-﻿using System;
+﻿namespace HttpClientExample;
+
+/////// date: 2022.01.29 //////////
+///// author: Narankhuu ///////////
+//// contact: codesaur@gmail.com //
+
+using System;
 using System.Windows;
 using System.Windows.Controls;
-
 using Newtonsoft.Json;
-
 using Gerege.Framework.Logger;
 using Gerege.Framework.HttpClient;
 
-namespace HttpClientExample
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    readonly SampleClient Client;
+    readonly DatabaseLogger Logger;
+
+    public MainWindow()
     {
-        readonly SampleClient Client;
-        readonly DatabaseLogger Logger;
+        InitializeComponent();
 
-        public MainWindow()
+        Logger = new ConsoleLogger();
+
+        var pipeline = new BusyHandler()
         {
-            InitializeComponent();
-
-            Logger = new ConsoleLogger();
-
-            var pipeline = new BusyHandler()
+            InnerHandler = new LoggingHandler(Logger)
             {
-                InnerHandler = new LoggingHandler(Logger)
+                InnerHandler = new RetryHandler()
                 {
-                    InnerHandler = new RetryHandler()
-                    {
-                        // Бодит серверлүү хандах бол энэ удирдлага ашиглаарай
-                        //InnerHandler = new System.Net.Http.HttpClientHandler()
+                    // Бодит серверлүү хандах бол энэ удирдлага ашиглаарай
+                    //InnerHandler = new System.Net.Http.HttpClientHandler()
 
-                        // Туршилтын зорилгоор хуурамч сервер хандалтын удирдлага ашиглаж байна
-                        InnerHandler = new MockServerHandler()
-                    }
+                    // Туршилтын зорилгоор хуурамч сервер хандалтын удирдлага ашиглаж байна
+                    InnerHandler = new MockServerHandler()
                 }
-            };
-            Client = new(pipeline);
-        }
+            }
+        };
+        Client = new(pipeline);
+    }
 
-        public struct Welcome
+    public struct Welcome
+    {
+        public static int GeregeMessage() => 3;
+
+        [JsonProperty("title", Required = Required.Always)]
+        public string Title { get; set; }
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        string res = "";
+        try
         {
-            public static int GeregeMessage() => 3;
-
-            [JsonProperty("title", Required = Required.Always)]
-            public string Title { get; set; }
+            Welcome t = Client.Request<Welcome>(new { get = "title" });
+            res = t.Title;
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        catch (Exception ex)
         {
-            string res = "";
-            try
-            {
-                Welcome t = Client.Request<Welcome>(new { get = "title" });
-                res = t.Title;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("button", "Welcome-ийг авах үед алдаа гарлаа", ex);
-                res = ex.Message;
-            }
-            finally
-            {
-                var button = (Button)sender;
-                button.Content = res;
-            }
+            Logger.Error("button", "Welcome-ийг авах үед алдаа гарлаа", ex);
+            res = ex.Message;
+        }
+        finally
+        {
+            var button = (Button)sender;
+            button.Content = res;
         }
     }
 }
