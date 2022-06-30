@@ -1,11 +1,11 @@
-﻿namespace Gerege.Framework.HttpClient;
+﻿using System;
+using Newtonsoft.Json;
 
 /////// date: 2021.12.17 //////////
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-using System;
-using Newtonsoft.Json;
+namespace Gerege.Framework.HttpClient;
 
 /// <summary>
 /// Гэрэгэ серверлүү хандах токен зөвшөөрөл.

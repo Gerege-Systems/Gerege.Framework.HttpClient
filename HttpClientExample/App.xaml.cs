@@ -1,14 +1,12 @@
-﻿#pragma warning disable IDE0060
-#pragma warning disable CS8603
-
-namespace HttpClientExample;
+﻿
+using System.Windows;
+using System.Net.Http;
 
 /////// date: 2022.01.29 //////////
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-using System.Windows;
-using System.Net.Http;
+namespace HttpClientExample;
 
 /// <summary>
 /// Interaction logic for App.xaml
@@ -19,6 +17,8 @@ public partial class App : Application
     public bool Busy { get; set; } = false;
 }
 
+#pragma warning disable IDE0060
+#pragma warning disable CS8603
 public static class AppExtension
 {
     public static App App(this DelegatingHandler a)

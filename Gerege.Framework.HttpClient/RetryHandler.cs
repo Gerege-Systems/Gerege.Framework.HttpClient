@@ -1,16 +1,16 @@
-﻿namespace Gerege.Framework.HttpClient;
-
-/////// date: 2022.01.23 //////////
-///// author: Narankhuu ///////////
-//// contact: codesaur@gmail.com //
-
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+
+/////// date: 2022.01.23 //////////
+///// author: Narankhuu ///////////
+//// contact: codesaur@gmail.com //
+
+namespace Gerege.Framework.HttpClient;
 
 /// <summary>
 /// HTTP хүсэлт илгээх үед амжилтгүй болсон тохиолдолд дахин оролдох удирдлага.

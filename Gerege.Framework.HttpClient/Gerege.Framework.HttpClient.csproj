@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>gerege-win.ico</ApplicationIcon>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Version>5.5.0</Version>
+    <Version>6.0.0-preview</Version>
     <Authors>Гэрэгэ Системс ХХК</Authors>
     <Description>Gerege Application Development Framework - HttpClient library</Description>
     <Copyright>Gerege Systems LLC</Copyright>
@@ -24,14 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gerege.Framework.Logger" Version="5.5.0" />
+    <PackageReference Include="Gerege.Framework.Logger" Version="6.0.0-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Security" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

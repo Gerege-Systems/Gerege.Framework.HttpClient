@@ -7,7 +7,7 @@ using Gerege.Framework.Logger;
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-namespace HttpClientExample;
+namespace HttpClientExample.NET_6;
 
 /// <summary>
 /// Хөгжүүлэлтийн орчинд Debug горимтой үед Output консол дээр лог харуулах обьект.

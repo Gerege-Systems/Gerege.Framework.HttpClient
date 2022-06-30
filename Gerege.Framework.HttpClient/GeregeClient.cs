@@ -1,10 +1,4 @@
-﻿namespace Gerege.Framework.HttpClient;
-
-/////// date: 2021.12.23 //////////
-///// author: Narankhuu ///////////
-//// contact: codesaur@gmail.com //
-
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -12,6 +6,12 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+
+/////// date: 2021.12.23 //////////
+///// author: Narankhuu ///////////
+//// contact: codesaur@gmail.com //
+
+namespace Gerege.Framework.HttpClient;
 
 /// <summary>
 /// Гэрэгэ HTTP клиент хийсвэр класс.

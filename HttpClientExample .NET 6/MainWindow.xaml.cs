@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Windows;
-using System.Windows.Controls;
+using Microsoft.UI.Xaml;
 using Newtonsoft.Json;
 using Gerege.Framework.Logger;
 using Gerege.Framework.HttpClient;
 
-/////// date: 2022.01.29 //////////
-///// author: Narankhuu ///////////
-//// contact: codesaur@gmail.com //
+namespace HttpClientExample.NET_6;
 
-namespace HttpClientExample;
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public partial class MainWindow : Window
+public sealed partial class MainWindow : Window
 {
     readonly SampleClient Client;
     readonly DatabaseLogger Logger;
 
     public MainWindow()
     {
-        InitializeComponent();
+        this.InitializeComponent();
 
         Logger = new ConsoleLogger();
 
@@ -50,12 +48,12 @@ public partial class MainWindow : Window
         public string Title { get; set; }
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
+    private void myButton_Click(object sender, RoutedEventArgs e)
     {
         string res = "";
         try
         {
-            Welcome t = Client.Request<Welcome>(new { get = "title" });
+            Welcome t = Client.CacheRequest<Welcome>(new { get = "title" });
             res = t.Title;
         }
         catch (Exception ex)
@@ -65,8 +63,7 @@ public partial class MainWindow : Window
         }
         finally
         {
-            var button = (Button)sender;
-            button.Content = res;
+            myButton.Content = res;
         }
     }
 }

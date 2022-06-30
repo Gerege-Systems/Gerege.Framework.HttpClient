@@ -1,10 +1,10 @@
-﻿namespace Gerege.Framework.HttpClient;
+﻿using System;
 
 /////// date: 2020.12.11 //////////
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-using System;
+namespace Gerege.Framework.HttpClient;
 
 /// <summary>
 /// Гэрэгэ диспетчер серверээс ирсэн хариу dynamic бүтцээр.

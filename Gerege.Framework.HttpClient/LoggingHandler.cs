@@ -1,14 +1,14 @@
-﻿namespace Gerege.Framework.HttpClient;
+﻿using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using Gerege.Framework.Logger;
 
 /////// date: 2022.01.23 //////////
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Gerege.Framework.Logger;
+namespace Gerege.Framework.HttpClient;
 
 /// <summary>
 /// HTTP хүсэлт гүйцэтгэх үед лог мэдээлэл хадгалах удирдлага.

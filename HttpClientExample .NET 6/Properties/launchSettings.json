@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "HttpClientExample .NET 6 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "HttpClientExample .NET 6 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

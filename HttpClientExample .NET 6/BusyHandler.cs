@@ -8,7 +8,7 @@ using System.Diagnostics;
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-namespace HttpClientExample;
+namespace HttpClientExample.NET_6;
 
 /// <summary>
 /// HTTP хүсэлт гүйцэтгэх үед Application Busy төлөвийг удирдах.

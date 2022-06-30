@@ -1,10 +1,4 @@
-﻿namespace Gerege.Framework.HttpClient;
-
-/////// date: 2019.11.02 //////////
-///// author: Narankhuu ///////////
-//// contact: codesaur@gmail.com //
-
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Linq;
@@ -12,6 +6,12 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+/////// date: 2019.11.02 //////////
+///// author: Narankhuu ///////////
+//// contact: codesaur@gmail.com //
+
+namespace Gerege.Framework.HttpClient;
 
 /// <summary>
 /// Cache файл обьекттэй ажиллах класс.
