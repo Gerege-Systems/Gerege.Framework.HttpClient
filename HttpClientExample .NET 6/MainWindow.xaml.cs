@@ -53,7 +53,7 @@ public sealed partial class MainWindow : Window
         string res = "";
         try
         {
-            Welcome t = Client.CacheRequest<Welcome>(new { get = "title" });
+            Welcome t = Client.Request<Welcome>(new { get = "title" });
             res = t.Title;
         }
         catch (Exception ex)
