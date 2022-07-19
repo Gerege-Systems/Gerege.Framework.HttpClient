@@ -3,8 +3,9 @@ using Microsoft.UI.Xaml;
 using Newtonsoft.Json;
 using Gerege.Framework.Logger;
 using Gerege.Framework.HttpClient;
+using SharedExample;
 
-namespace HttpClientExample.NET_6;
+namespace HttpClientExample;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using Newtonsoft.Json;
 using Gerege.Framework.Logger;
 using Gerege.Framework.HttpClient;
+using SharedExample;
 
 /////// date: 2022.01.29 //////////
 ///// author: Narankhuu ///////////

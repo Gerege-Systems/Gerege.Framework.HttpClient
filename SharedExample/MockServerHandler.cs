@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-namespace HttpClientExample;
+namespace SharedExample;
 
 /// <summary>
 /// Туршилтын зорилгоор хуурамч сервер хандалт үүсгэв
@@ -23,14 +23,15 @@ public sealed class MockServerHandler : HttpMessageHandler
         {
             Thread.Sleep(500); // Интернетээр хандаж буй мэт сэтгэгдэл төрүүлэх үүднээс хором хүлээлгэе
 
-            string requestTarget = request.RequestUri.ToString();
+            string? requestTarget = request.RequestUri?.ToString();
             if (requestTarget != "http://mock-server/api")
                 throw new("Unknown route pattern [" + requestTarget + "]");
 
-            Task<string> input = request.Content.ReadAsStringAsync();
-            dynamic? payload = JsonConvert.DeserializeObject(input.Result);
+            Task<string>? input = request.Content?.ReadAsStringAsync(cancellationToken);
+            if (input is null)
+                throw new("Invalid input!");
 
-            return HandleMessages(payload);
+            return HandleMessages(JsonConvert.DeserializeObject(input.Result));
         }
         catch (Exception ex)
         {

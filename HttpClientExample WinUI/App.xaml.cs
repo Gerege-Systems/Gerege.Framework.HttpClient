@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using Microsoft.UI.Xaml;
 
-namespace HttpClientExample.NET_6;
+namespace HttpClientExample;
 
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.

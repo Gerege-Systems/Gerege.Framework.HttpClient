@@ -5,7 +5,7 @@ using Gerege.Framework.HttpClient;
 ///// author: Narankhuu ///////////
 //// contact: codesaur@gmail.com //
 
-namespace HttpClientExample;
+namespace SharedExample;
 
 public class SampleClient : GeregeClient
 {
