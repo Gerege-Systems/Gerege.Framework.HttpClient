@@ -14,7 +14,7 @@
 		<dependencies>
             <dependency id="Newtonsoft.Json" version="13.0.1" />
             <dependency id="System.Security.Cryptography.ProtectedData" version="6.0.0" />
-            <dependency id="Gerege.Framework.Logger" version="6.0.0-preview" />
+            <dependency id="Gerege.Framework.Logger" version="6.0.0" />
         </dependencies>
 	</metadata>
 	<files>
