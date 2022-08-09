@@ -29,7 +29,7 @@ public class GeregeCache
     /// <param name="msg">Мэдээллийн мессеж дугаар.</param>
     /// <param name="payload">Мэдээллийн хүсэлтийн бие.</param>
     /// <param name="folderPath">Файл хадгалагдах хавтасны зам.</param>
-    public GeregeCache(int msg, dynamic? payload = null, string? folderPath = null)
+    public GeregeCache(int msg, object? payload = null, string? folderPath = null)
     {
         try
         {
@@ -80,14 +80,14 @@ public class GeregeCache
     /// Амжилттай уншсан тохиолдолд .NET обьект утга буцаана.
     /// Бусад тохиолдолд CacheLoadException үүсэх тул заавал try {} catch (Exception) {} код блок дунд ашиглана.
     /// </returns>
-    public dynamic Load()
+    public object Load()
     {
         if (!Exists()) throw new("Cache байдгүй шүү. Яахуу найзаа?");
 
         using StreamReader r = new(FilePath);
         string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
 
-        dynamic? response = JsonConvert.DeserializeObject(fileDataDecrypted);
+        object? response = JsonConvert.DeserializeObject(fileDataDecrypted);
 
         if (response is null) throw new(FilePath + ": Null result!");
 
@@ -120,7 +120,7 @@ public class GeregeCache
     /// Cache мэдээллийг файл үүсгэн бичиж хадгална. Нэр бүхий файл аль хэдийн үүссэн байсан тохиолдолд тухайн файлыг устгаад шинээр үүсгэх болно.
     /// </summary>
     /// <param name="data">Хадгалах мэдээлэл бүхий обьект.</param>
-    public bool Create(dynamic data)
+    public bool Create(object? data)
     {
         if (string.IsNullOrEmpty(FilePath))
             throw new("Cache тохируулга буруу хийгдсэн байна!");

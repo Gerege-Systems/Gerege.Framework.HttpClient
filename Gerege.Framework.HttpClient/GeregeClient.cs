@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -43,7 +42,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// <returns>
     /// Гэрэгэ мессеж дугаарыг амжилттай буцаана.
     /// </returns>
-    private int GetMessageCode<T>()
+    protected virtual int GetMessageCode<T>()
     {
         Type type = typeof(T);
 
@@ -70,9 +69,9 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// <code>
     /// // override code sample
     /// GeregeToken? _currentToken = null;
-    /// dynamic? _fetchTokenPayload = null;
+    /// object? _fetchTokenPayload = null;
     /// 
-    /// protected override GeregeToken? FetchToken(dynamic? payload = null)
+    /// protected override GeregeToken? FetchToken(object? payload = null)
     /// {
     ///      if (payload is not null)
     ///         _fetchTokenPayload = payload;
@@ -100,7 +99,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// <returns>
     /// RFC 6750 Bearer Token | null.
     /// </returns>
-    protected virtual GeregeToken? FetchToken(dynamic? payload = null)
+    protected virtual GeregeToken? FetchToken(object? payload = null)
     {
         return null;
     }
@@ -119,7 +118,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// <returns>
     /// Амжилттай байгуулсан хүсэлтийг буцаана.
     /// </returns>
-    protected virtual HttpRequestMessage CreateRequest<T>(string? requestUri, HttpMethod? method = null, dynamic? payload = null)
+    protected virtual HttpRequestMessage CreateRequest<T>(string? requestUri, HttpMethod? method = null, object? payload = null)
     {
         if (string.IsNullOrEmpty(requestUri))
             throw new(GetType().Name + ": Error on CreateRequest<T> -> Must be set requestUri or BaseAddress!");
@@ -160,7 +159,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// <returns>
     /// Серверээс ирсэн хариуг амжилттай авч тухайн зарласан T темплейт класс обьектэд хөрвүүлсэн утгыг буцаана.
     /// </returns>
-    public virtual T Request<T>(dynamic? payload = null, HttpMethod? method = null, string? requestUri = null)
+    public virtual T Request<T>(object? payload = null, HttpMethod? method = null, string? requestUri = null)
     {
         HttpLastResponse = null;
 
@@ -216,18 +215,14 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// <returns>
     /// Серверээс ирсэн хариуг амжилттай авсан эсвэл Cache дээрээс амжилттай уншсан мэдээллийг тухайн зарласан T темплейт класс обьектэд хөрвүүлсэн утгыг буцаана
     /// </returns>
-    public virtual T CacheRequest<T>(dynamic? payload = null, HttpMethod? method = null, string? requestUri = null)
+    public virtual T CacheRequest<T>(object? payload = null, HttpMethod? method = null, string? requestUri = null)
     {
         GeregeCache cache = new(GetMessageCode<T>(), payload, CachePath);
         try
         {
             return cache.Load<T>();
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex);
-            // Cache байхгүй эсвэл уншиж чадаагүй
-        }
+        catch { /* Cache байхгүй эсвэл уншиж чадаагүй */ }
 
         T result = Request<T>(payload, method, requestUri);
 
@@ -236,10 +231,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
         {
             cacheCreated = cache.Create(result);
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex);
-        }
+        catch { /* Cache үүсгэж чадсангүй */ }
         finally
         {
             if (!cacheCreated && cache.Exists())

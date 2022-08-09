@@ -43,7 +43,7 @@ public sealed partial class MainWindow : Window
 
     public struct Welcome
     {
-        public static int GeregeMessage() => 3;
+        public int GeregeMessage() => 3;
 
         [JsonProperty("title", Required = Required.Always)]
         public string Title { get; set; }
