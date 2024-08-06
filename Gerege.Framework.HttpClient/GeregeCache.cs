@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Linq;
 using System.Diagnostics;
 using System.Security.Cryptography;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 /////// date: 2019.11.02 //////////
 ///// author: Narankhuu ///////////
@@ -26,10 +25,9 @@ public class GeregeCache
     /// <summary>
     /// Cache файл обьект үүсгэх байгуулагч.
     /// </summary>
-    /// <param name="msg">Мэдээллийн мессеж дугаар.</param>
     /// <param name="payload">Мэдээллийн хүсэлтийн бие.</param>
     /// <param name="folderPath">Файл хадгалагдах хавтасны зам.</param>
-    public GeregeCache(int msg, object? payload = null, string? folderPath = null)
+    public GeregeCache(object payload, string? folderPath = null)
     {
         try
         {
@@ -43,16 +41,9 @@ public class GeregeCache
                 folderPath = $"{currentDir.FullName}{slash}Cache";
             }
             
-            string filePath = $"{folderPath}{slash}[{msg}]";
-            
-            if (payload is not null)
-            {
-                JObject jobj = JObject.FromObject(payload);
-
-                filePath += " " + string.Join(" ",
-                    jobj.Children().Cast<JProperty>()
-                    .Select(jp => jp.Name + "=" + jp.Value.ToString()));
-            }
+            string filePath = $"{folderPath}{slash}";
+            using var doc = JsonDocument.Parse(JsonSerializer.Serialize(payload));
+            filePath += string.Join(" ", doc.RootElement.EnumerateObject().Select(jp => jp.Name + "=" + jp.Value.ToString()));
             filePath += ".json";
 
             FileInfo fi = new(filePath);
@@ -62,7 +53,10 @@ public class GeregeCache
                 Directory.CreateDirectory(fi.DirectoryName);
             FilePath = filePath;
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GeregeCache: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -86,12 +80,8 @@ public class GeregeCache
 
         using StreamReader r = new(FilePath);
         string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
-
-        object? response = JsonConvert.DeserializeObject(fileDataDecrypted);
-
-        if (response is null) throw new(FilePath + ": Null result!");
-
-        return response;
+        object? response = JsonSerializer.Deserialize<object>(fileDataDecrypted);
+        return response is null ? throw new($"{FilePath}: Null result!") : response;
     }
 
     /// <summary>
@@ -104,16 +94,12 @@ public class GeregeCache
     /// </returns>
     public T Load<T>()
     {
-        if (!Exists()) throw new(FilePath + ": Cache байдгүй шүү. Яахуу найзаа?");
+        if (!Exists()) throw new($"{FilePath}: Cache байдгүй шүү. Яахуу найзаа?");
 
         using StreamReader r = new(FilePath);
         string fileDataDecrypted = UnProtect(r.ReadToEnd(), DataProtectionScope.CurrentUser);
-
-        dynamic? response = JsonConvert.DeserializeObject<T>(fileDataDecrypted);
-
-        if (response is null) throw new(FilePath + ": Null result!");
-
-        return response;
+        T? response = JsonSerializer.Deserialize<T>(fileDataDecrypted);
+        return response is null ? throw new($"{FilePath}: Null result!") : response;
     }
 
     /// <summary>
@@ -127,13 +113,10 @@ public class GeregeCache
 
         if (Exists()) File.Delete(FilePath);
 
-        using (StreamWriter file = File.CreateText(FilePath))
-        {
-            string plainData = JsonConvert.SerializeObject(data);
-            string encryptedData = Protect(plainData, DataProtectionScope.CurrentUser);
-
-            file.WriteLine(encryptedData);
-        }
+        using StreamWriter file = File.CreateText(FilePath);
+        string plainData = JsonSerializer.Serialize(data);
+        string encryptedData = Protect(plainData, DataProtectionScope.CurrentUser);
+        file.WriteLine(encryptedData);
 
         return true;
     }

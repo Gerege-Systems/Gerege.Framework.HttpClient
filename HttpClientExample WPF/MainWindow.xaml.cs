@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using Newtonsoft.Json;
+
 using Gerege.Framework.Logger;
 using Gerege.Framework.HttpClient;
+
 using SharedExample;
+using System.Text.Json.Serialization;
 
 /////// date: 2022.01.29 //////////
 ///// author: Narankhuu ///////////
@@ -45,9 +47,8 @@ public partial class MainWindow : Window
 
     public struct Welcome
     {
-        public int GeregeMessage() => 3;
-
-        [JsonProperty("title", Required = Required.Always)]
+        [JsonPropertyName("title")]
+        [JsonRequired]
         public string Title { get; set; }
     }
 

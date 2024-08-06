@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 /////// date: 2021.12.17 //////////
 ///// author: Narankhuu ///////////
@@ -13,15 +13,18 @@ namespace Gerege.Framework.HttpClient;
 public class GeregeToken
 {
     /// <summary>Токен утга.</summary>
-    [JsonProperty("token", Required = Required.Always)]
+    [JsonPropertyName("token")]
+    [JsonRequired]
     public string? Value { get; internal set; }
 
     /// <summary>Токен дуусах хүртэлх хүчинтэй огноо.</summary>
-    [JsonProperty("expires", Required = Required.Always)]
+    [JsonPropertyName("expires")]
+    [JsonRequired]
     public DateTime ExpireDate { get; internal set; }
 
     /// <summary>Токен амьдрах хугацаа секундээр.</summary>
-    [JsonProperty("expires_in", Required = Required.Always)]
+    [JsonPropertyName("expires_in")]
+    [JsonRequired]
     public int LifeSeconds { get; internal set; }
 
     /// <summary>Токен хүлээн авсан системийн локал огноо.</summary>

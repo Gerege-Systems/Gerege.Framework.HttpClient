@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Text.Json.Serialization;
+
 using Microsoft.UI.Xaml;
-using Newtonsoft.Json;
+
 using Gerege.Framework.Logger;
 using Gerege.Framework.HttpClient;
+
 using SharedExample;
 
 namespace HttpClientExample;
@@ -33,7 +36,7 @@ public sealed partial class MainWindow : Window
                     // Бодит серверлүү хандах бол энэ удирдлага ашиглаарай
                     //InnerHandler = new System.Net.Http.HttpClientHandler()
 
-                    // Туршилтын зорилгоор хуурамч сервер хандалтын удирдлага ашиглаж байна
+                    // Туршилтын зорилгоор хуурмаг сервер хандалтын удирдлага ашиглаж байна
                     InnerHandler = new MockServerHandler()
                 }
             }
@@ -43,13 +46,12 @@ public sealed partial class MainWindow : Window
 
     public struct Welcome
     {
-        public int GeregeMessage() => 3;
-
-        [JsonProperty("title", Required = Required.Always)]
+        [JsonPropertyName("title")]
+        [JsonRequired]
         public string Title { get; set; }
     }
 
-    private void myButton_Click(object sender, RoutedEventArgs e)
+    private void MyButton_Click(object sender, RoutedEventArgs e)
     {
         string res = "";
         try
@@ -64,7 +66,7 @@ public sealed partial class MainWindow : Window
         }
         finally
         {
-            myButton.Content = res;
+            MyButton.Content = res;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Gerege.Framework.Logger;
 
 /////// date: 2022.01.23 //////////
@@ -13,21 +14,16 @@ namespace Gerege.Framework.HttpClient;
 /// <summary>
 /// HTTP хүсэлт гүйцэтгэх үед лог мэдээлэл хадгалах удирдлага.
 /// </summary>
-public class LoggingHandler : DelegatingHandler
+/// <remarks>
+/// HTTP хүсэлт гүйцэтгэх үед лог хадгалах удирдлага үүсгэх.
+/// <para>
+/// Лог мэдээллийг http хүснэгтэд хадгална гэж үзнэ.
+/// </para>
+/// </remarks>
+/// <param name="logger">Лог мэдээллийг хадгалагч объект.</param>
+public class LoggingHandler(DatabaseLogger logger) : DelegatingHandler
 {
-    private readonly DatabaseLogger _db_logger;
-
-    /// <summary>
-    /// HTTP хүсэлт гүйцэтгэх үед лог хадгалах удирдлага үүсгэх.
-    /// <para>
-    /// Лог мэдээллийг http хүснэгтэд хадгална гэж үзнэ.
-    /// </para>
-    /// </summary>
-    /// <param name="logger">Лог мэдээллийг хадгалагч объект.</param>
-    public LoggingHandler(DatabaseLogger logger)
-    {
-        _db_logger = logger;
-    }
+    private readonly DatabaseLogger _db_logger = logger;
 
     /// <inheritdoc />
     protected override async Task<HttpResponseMessage> SendAsync(
@@ -37,21 +33,18 @@ public class LoggingHandler : DelegatingHandler
         {
             // Хүсэлт үүссэн огноогоор лог мсж үүсгэе
             string id = DateTime.Now.ToString("yyyyMMdd_Hmmss_");
-            
-            string message_code = string.Join("", request.Headers.GetValues("message_code"));
 
-            // Хүсэлтийн толгойд мсж код байвал лог мсж-д хадгалъя
-            if (!string.IsNullOrEmpty(message_code)
-                || request.Method != HttpMethod.Post) id += message_code + "_";
+            // Хүсэлтийн зам ба дүрмийг лог мсж-д хадгалъя
+            id += $"{request.RequestUri.AbsolutePath}_{request.Method}_";
 
             // Илгээж буй хүсэлтийн мэдээллийг логын хэвийн түвшинд хадгалъяа
-            _db_logger.Notice("http", id + "request", await request.Content.ReadAsStringAsync());
+            _db_logger.Notice("http", $"{id}request", await request.Content.ReadAsStringAsync());
 
             // base.SendAsync нь голын боловсруулагчийг ажиллуулж байна
             var response = await base.SendAsync(request, cancellationToken);
 
             // Амжилттай хүлээн авсан хариу мэдээллийг логын хэвийн түвшинд хадгалъяа
-            _db_logger.Notice("http", id + "response", await response.Content.ReadAsStringAsync());
+            _db_logger.Notice("http", $"{id}response", await response.Content.ReadAsStringAsync());
 
             // Амжилттай хүлээн авсан хариу мэдээллийг дараагийн боловсруулагчид шилжүүлье
             return response;

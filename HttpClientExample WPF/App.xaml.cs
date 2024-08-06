@@ -1,5 +1,4 @@
-﻿
-using System.Windows;
+﻿using System.Windows;
 using System.Net.Http;
 
 /////// date: 2022.01.29 //////////

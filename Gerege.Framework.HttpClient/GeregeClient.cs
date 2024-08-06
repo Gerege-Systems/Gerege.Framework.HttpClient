@@ -2,9 +2,10 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
+using System.Text.Json;
+using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 /////// date: 2021.12.23 //////////
 ///// author: Narankhuu ///////////
@@ -27,36 +28,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     public GeregeClient(HttpMessageHandler handler) : base(handler)
     {
         DefaultRequestHeaders.Add(HttpRequestHeader.Accept.ToString(), "application/json");
-        DefaultRequestHeaders.Add(HttpRequestHeader.UserAgent.ToString(), "Gerege HTTP Client - C# V5");
-    }
-
-    /// <summary>
-    /// T темплейт төрлөөс Гэрэгэ мессеж дугаарыг авах.
-    /// <para>
-    /// T темплейт төрөл нь Гэрэгэ мессеж дугаар өгөх public virtual int GeregeMessage() { return 564654; } function агуулсан байх ёстой.
-    /// </para>
-    /// </summary>
-    /// <exception cref="Exception">
-    /// T темплейт төрөл нь Гэрэгэ мессеж дугаарын function агуулаагүй байвал Exception үүсгэж шалтгааныг мэдэгдэнэ.
-    /// </exception>
-    /// <returns>
-    /// Гэрэгэ мессеж дугаарыг амжилттай буцаана.
-    /// </returns>
-    protected virtual int GetMessageCode<T>()
-    {
-        Type type = typeof(T);
-
-        object? instanceOfType = Activator.CreateInstance(type);
-        if (instanceOfType is null)
-            throw new(GetType().Name + ": Error on GetMessageCode<T> -> Invalid type!");
-
-        MethodInfo? geregeMessage = type.GetMethod("GeregeMessage");
-        if (geregeMessage is null)
-            throw new(GetType().Name + ": Error on GetMessageCode<T> -> Unknown Gerege message!");
-
-        object resultCode = geregeMessage.Invoke(instanceOfType, Array.Empty<object>());
-        return resultCode is int @int ? @int :
-            throw new(GetType().Name + ": Error on GetMessageCode<T> -> Invalid Gerege message defination!");
+        DefaultRequestHeaders.Add(HttpRequestHeader.UserAgent.ToString(), "Gerege HTTP Client - C# V8");
     }
 
     /// <summary>
@@ -106,10 +78,9 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
 
     /// <summary>
     /// HTTP хүсэлт үүсгэх.
-    /// Өгөгдөл JSON бүтцээр дамжуулагдана гэж үзсэн байгаа.
-    /// Хэрвээ instance дээр Token утга олгогдсон байгаа бол RFC 6750 Bearer Token дүрмийн дагуу хүсэлтийн толгойд оруулна.
+    /// Өгөгдөл JSON бүтцээр дамжуулагдана гэж үзнэ.
     /// <para>
-    /// Зөв зарлагдсан T темплейт класс/бүтцээс Гэрэгэ мессеж дугаарыг авч хүсэлтийн толгойн message_code талбарт мөн онооно.
+    /// Хэрвээ instance дээр Token утга олгогдсон байгаа бол RFC 6750 Bearer Token дүрмийн дагуу хүсэлтийн толгойд оруулна.
     /// </para>
     /// </summary>
     /// <param name="requestUri">Хүсэлт илгээх хаяг.</param>
@@ -121,28 +92,28 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     protected virtual HttpRequestMessage CreateRequest<T>(string? requestUri, HttpMethod? method = null, object? payload = null)
     {
         if (string.IsNullOrEmpty(requestUri))
-            throw new(GetType().Name + ": Error on CreateRequest<T> -> Must be set requestUri or BaseAddress!");
+            throw new($"{GetType().Name}: Error on CreateRequest<T> -> Must be set requestUri or BaseAddress!");
 
         var request = new HttpRequestMessage
         {
             RequestUri = new(requestUri),
             Method = method ?? HttpMethod.Post,
-            Content = new StringContent(JsonConvert.SerializeObject(payload))
+            Content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            )
         };
-
-        int msg = GetMessageCode<T>();
-        request.Headers.Add("message_code", Convert.ToString(msg));
 
         GeregeToken? token = FetchToken();
         if (token is not null && !string.IsNullOrEmpty(token.Value))
-            request.Headers.Add(HttpRequestHeader.Authorization.ToString(), "Bearer " + token.Value);
+            request.Headers.Add(HttpRequestHeader.Authorization.ToString(), $"Bearer {token.Value}");
 
         return request;
     }
 
     /// <summary>
     /// HTTP хүсэлт үүсгэж илгээн мэдээлэл хүлээж авах.
-    /// Зөв зарлагдсан T темплейт класс/бүтцээс Гэрэгэ мессеж дугаарыг авч хүсэлтийн толгойн message_code талбарт онооно.
     /// <para>
     /// T темплейт бүтэц/класс буруу зарлагдсан, хүсэлтийн параметрууд буруу өгөгдсөн, холболт тасарсан, серверээс хариу ирээгүй, ирсэн хариуны формат зөрсөн
     /// гэх мэтчилэн болон өөр бусад шалтгаануудын улмаас Exception алдаа үүсэх боломжтой тул заавал try {} catch (Exception) {} код блок дунд ашиглана.
@@ -170,27 +141,25 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
             return await responsMessage.Content.ReadAsStringAsync();
         }).Result;
 
-        dynamic? content = JsonConvert.DeserializeObject(contentString);
-        if (content is null)
-            throw new(GetType().Name + ": Error on Request<T> -> Invalid JSON response! response.content: " + contentString);
+        using JsonDocument document = JsonDocument.Parse(contentString);
+        if (!document.RootElement.TryGetProperty("code", out JsonElement codeElement)
+            || !document.RootElement.TryGetProperty("status", out JsonElement statusElement))
+            throw new Exception($"{GetType().Name}: Error on Request<T>. Invalid Gerege response! response.content -> {contentString}");
 
-        if (content.code is null || content.status is null)
-            throw new(GetType().Name + ": Error on Request<T> -> Invalid Gerege response! response.content: " + contentString);
+        string? msg = document.RootElement.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : null;
+        object? result = document.RootElement.TryGetProperty("result", out JsonElement resultElement) ? JsonSerializer.Deserialize<object>(resultElement.GetRawText()) : null;
 
         HttpLastResponse = new(
-            Convert.ToInt32(content.code),
-            Convert.ToString(content.status),
-            Convert.ToString(content.message ?? "Empty message"),
-            content.result ?? new { }
+            codeElement.GetInt32(),
+            statusElement.GetString()!,
+            msg ?? "Empty message",
+            result ?? new { }
         );
 
         if (!HttpLastResponse.IsSuccess)
-            throw new(HttpLastResponse.Message);
+            throw new Exception(HttpLastResponse.Message);
 
-        return JsonConvert.DeserializeObject<T>(
-            JsonConvert.SerializeObject(HttpLastResponse.Result),
-            new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
-        );
+        return JsonSerializer.Deserialize<T>(HttpLastResponse.Result.ToString(), new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull })!;
     }
 
     /// <summary>Cache хүсэлтийн хариу файлуудыг хадгалах хавтас зам.</summary>
@@ -217,7 +186,9 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// </returns>
     public virtual T CacheRequest<T>(object? payload = null, HttpMethod? method = null, string? requestUri = null)
     {
-        GeregeCache cache = new(GetMessageCode<T>(), payload, CachePath);
+        if (payload is null) Request<T>(payload, method, requestUri);
+
+        GeregeCache cache = new(payload!, CachePath);
         try
         {
             return cache.Load<T>();

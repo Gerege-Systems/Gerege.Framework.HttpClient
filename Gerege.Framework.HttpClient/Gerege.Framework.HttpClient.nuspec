@@ -12,13 +12,13 @@
 		<copyright>$copyright$</copyright>
 		<tags>gerege;client;httpclient</tags>
 		<dependencies>
-            <dependency id="Newtonsoft.Json" version="13.0.1" />
-            <dependency id="System.Security.Cryptography.ProtectedData" version="6.0.0" />
-            <dependency id="Gerege.Framework.Logger" version="6.0.0" />
-        </dependencies>
+        <dependency id="System.Security.Cryptography.ProtectedData" version="8.0.0" />
+        <dependency id="Gerege.Framework.Logger" version="8.1.0" />
+    </dependencies>
 	</metadata>
 	<files>
 		<file src=".\README.md" target="\" />
 		<file src=".\gerege-icon.png" target="\" />
 	</files>
 </package>
+	

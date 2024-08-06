@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 /////// date: 2022.01.29 //////////
 ///// author: Narankhuu ///////////
@@ -27,15 +27,8 @@ public sealed class MockServerHandler : HttpMessageHandler
             if (requestTarget != "http://mock-server/api")
                 throw new("Unknown route pattern [" + requestTarget + "]");
 
-            string message_code_header = string.Join("", request.Headers.GetValues("message_code"));
-            if (string.IsNullOrEmpty(message_code_header)
-                || request.Method != HttpMethod.Post) throw new Exception("Invalid request");
-
             Task<string>? input = request.Content?.ReadAsStringAsync(cancellationToken);
-            if (input is null)
-                throw new("Invalid input!");
-
-            return HandleMessages(Convert.ToInt32(message_code_header), JsonConvert.DeserializeObject(input.Result));
+            return input is null ? throw new("Invalid input!") : HandleMessages(JsonSerializer.Deserialize<JsonElement>(input.Result));
         }
         catch (Exception ex)
         {
@@ -50,24 +43,20 @@ public sealed class MockServerHandler : HttpMessageHandler
         }
     }
 
-    private Task<HttpResponseMessage> Respond(dynamic content, HttpStatusCode StatusCode = HttpStatusCode.OK)
+    private Task<HttpResponseMessage> Respond(object content, HttpStatusCode StatusCode = HttpStatusCode.OK)
     {
         return Task.FromResult(new HttpResponseMessage()
         {
             StatusCode = StatusCode,
-            Content = new StringContent(JsonConvert.SerializeObject(content))
+            Content = new StringContent(JsonSerializer.Serialize(content))
         });
     }
 
-    private Task<HttpResponseMessage> HandleMessages(int message_code, dynamic? payload)
+    private Task<HttpResponseMessage> HandleMessages(JsonElement payload)
     {
-        if (message_code != 3)
-            throw new("Unregistered message");
-
-        if (payload?.get is null)
+        if (!payload.TryGetProperty("get", out JsonElement get))
             throw new("Invalid payload");
-
-        if (Convert.ToString(payload.get) == "title")
+        else if(get.ToString() == "title")
             return Respond(new
             {
                 code = 200,

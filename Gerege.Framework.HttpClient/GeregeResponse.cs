@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 /////// date: 2020.12.11 //////////
 ///// author: Narankhuu ///////////
@@ -7,32 +8,28 @@
 namespace Gerege.Framework.HttpClient;
 
 /// <summary>
-/// Гэрэгэ диспетчер серверээс ирсэн хариу dynamic бүтцээр.
+/// Гэрэгэ диспетчер серверээс ирсэн хариу.
 /// </summary>
 [Serializable]
-public class GeregeResponse
+public class GeregeResponse(int code, string status, string message, object result)
 {
     /// <summary>Статус код.</summary>
-    public int Code { get; internal set; }
+    [JsonPropertyName("code")]
+    public int Code { get; internal set; } = code;
 
     /// <summary>Статус мэдэгдэл.</summary>
-    public string Status { get; internal set; }
+    [JsonPropertyName("status")]
+    public string Status { get; internal set; } = status;
 
     /// <summary>Тайлбар.</summary>
-    public string Message { get; internal set; }
+    [JsonPropertyName("message")]
+    public string Message { get; internal set; } = message;
 
     /// <summary>Үр дүн.</summary> 
-    public dynamic Result { get; internal set; }
+    [JsonPropertyName("result")]
+    public object Result { get; internal set; } = result;
 
     /// <summary>Серверээс хүлээн авсан үр дүн амжилттай төлөвт буй эсэх.</summary>
+    [JsonIgnore]
     public bool IsSuccess => Code == 200 && Status == "success";
-
-    /// <summary>Гэрэгэ серверээс ирсэн хариу.</summary>
-    public GeregeResponse(int code, string status, string message, dynamic result)
-    {
-        Code = code;
-        Status = status;
-        Message = message;
-        Result = result;
-    }
 }

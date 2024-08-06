@@ -15,19 +15,14 @@ namespace Gerege.Framework.HttpClient;
 /// <summary>
 /// HTTP хүсэлт илгээх үед амжилтгүй болсон тохиолдолд дахин оролдох удирдлага.
 /// </summary>
-public class RetryHandler : DelegatingHandler
+/// <remarks>
+/// HTTP хүсэлт илгээх үед амжилтгүй болсон тохиолдолд дахин хүсэлт илгээх үзэх зорилготой удирдлага.
+/// </remarks>
+/// <param name="tryCount">Нийт дээд тал нь хэдэн удаа оролдлого хийх тоо.</param>
+public class RetryHandler(uint tryCount = 3) : DelegatingHandler
 {
     // Нийт хэдэн удаа оролдлого хийх тоо
-    private readonly uint MaxTries;
-
-    /// <summary>
-    /// HTTP хүсэлт илгээх үед амжилтгүй болсон тохиолдолд дахин хүсэлт илгээх үзэх зорилготой удирдлага.
-    /// </summary>
-    /// <param name="tryCount">Нийт дээд тал нь хэдэн удаа оролдлого хийх тоо.</param>
-    public RetryHandler(uint tryCount = 3)
-    {
-        MaxTries = tryCount;
-    }
+    private readonly uint MaxTries = tryCount;
 
     /// <inheritdoc />
     protected override async Task<HttpResponseMessage?> SendAsync(
@@ -51,7 +46,7 @@ public class RetryHandler : DelegatingHandler
             try
             {
                 if (tryCount > 0)
-                    Debug.WriteLine(GetType().FullName + " нь " + (tryCount + 1) + " удаа оролдож байна.");
+                    Debug.WriteLine($"{GetType().FullName} нь {tryCount + 1} удаа оролдож байна.");
 
                 // base.SendAsync нь голын боловсруулагчийг ажиллуулж байна
                 var response = await base.SendAsync(request, cancellationToken);
