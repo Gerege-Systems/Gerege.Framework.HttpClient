@@ -12,8 +12,9 @@
 		<copyright>$copyright$</copyright>
 		<tags>gerege;client;httpclient</tags>
 		<dependencies>
-        <dependency id="System.Security.Cryptography.ProtectedData" version="8.0.0" />
-        <dependency id="Gerege.Framework.Logger" version="8.1.0" />
+      <dependency id="System.Security.Cryptography.ProtectedData" version="8.0.0" />
+      <dependency id="System.IdentityModel.Tokens.Jwt" version="8.0.1" />
+      <dependency id="Gerege.Framework.Logger" version="8.1.0" />
     </dependencies>
 	</metadata>
 	<files>

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Diagnostics;
 
 /////// date: 2021.12.17 //////////
 ///// author: Narankhuu ///////////
@@ -14,46 +16,45 @@ public class GeregeToken
 {
     /// <summary>Токен утга.</summary>
     [JsonPropertyName("token")]
-    [JsonRequired]
-    public string? Value { get; internal set; }
+    public string? Value { get; internal set; } = null;
 
     /// <summary>Токен дуусах хүртэлх хүчинтэй огноо.</summary>
-    [JsonPropertyName("expires")]
-    [JsonRequired]
-    public DateTime ExpireDate { get; internal set; }
-
-    /// <summary>Токен амьдрах хугацаа секундээр.</summary>
-    [JsonPropertyName("expires_in")]
-    [JsonRequired]
-    public int LifeSeconds { get; internal set; }
-
-    /// <summary>Токен хүлээн авсан системийн локал огноо.</summary>
     [JsonIgnore]
-    public DateTime CreatedLocalTime { get; internal set; }
-
-    /// <summary>Токен үүсэх.</summary>
-    public GeregeToken()
-    {
-        Update(null, DateTime.Now, 0);
-    }
+    public DateTime ValidTo { get; internal set; }
 
     /// <summary>
     /// Токен шинэчлэх.
     /// Токен чухал мэдээлэл тул internal set дүрмээр шинэчлэнэ.
     /// </summary>
-    /// <param name="value">Токен утга.</param>
-    /// <param name="expires">Токен дуусах хүртэлх хүчинтэй хугацаа.</param>
-    /// <param name="life_seconds">Токен хүчинтэй хугацаа секундээр.</param>
-    public void Update(string? value, DateTime expires, int life_seconds)
+    /// <param name="jwt">JWT утга.</param>
+    public void Update(string jwt)
     {
-        Value = value;
-        ExpireDate = expires;
-        LifeSeconds = life_seconds;
+        try
+        {
+            var token = new JwtSecurityToken(jwt);
 
-        CreatedLocalTime = DateTime.Now;
+            Value = jwt;
+            ValidTo = Convert.ToDateTime(token.ValidTo);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+        }
     }
 
-    /// <summary>Токен хугацаа дууссан эсвэл дуусаж буй эсэх.</summary>
+    /// <summary>JWT хүчинтэй заагдсан эсэх.</summary>
     [JsonIgnore]
-    public bool IsExpiring => (DateTime.Now - CreatedLocalTime).TotalSeconds + 60 > LifeSeconds;
+    public bool IsValid => Value != null && !IsExpiring;
+
+    /// <summary>Токен хугацаа дууссан эсвэл дуусаж буй эсэх.
+    /// <para>
+    /// Дууссан эсвэл дуусах хүртэл 20 секундээс бага хугацаа үлдсэн.
+    /// </para>
+    /// </summary>
+    [JsonIgnore]
+    public bool IsExpiring => DateTime.Now > ValidTo.AddSeconds(-20);
+
+    /// <summary>Токен утгыг JWT обьект болгон авах.</summary>
+    [JsonIgnore]
+    public JwtSecurityToken? JWT => string.IsNullOrEmpty(Value) ? null : new JwtSecurityToken(Value);
 }

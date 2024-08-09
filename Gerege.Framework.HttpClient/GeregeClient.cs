@@ -21,9 +21,6 @@ namespace Gerege.Framework.HttpClient;
 /// </summary>
 public abstract class GeregeClient : System.Net.Http.HttpClient
 {
-    /// <summary>Серверээс хамгийн сүүлд авсан гэрэгэ хариу.</summary>
-    public GeregeResponse? HttpLastResponse { get; set; } = null;
-
     /// <inheritdoc />
     public GeregeClient(HttpMessageHandler handler) : base(handler)
     {
@@ -56,7 +53,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     ///      }
     ///      
     ///     if (payload is not null)
-    ///         _currentToken = RequestSampleToken(payload);
+    ///         _currentToken = RequestToken(payload);
     ///         
     ///     return _currentToken;
     /// }
@@ -106,7 +103,7 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
         };
 
         GeregeToken? token = FetchToken();
-        if (token is not null && !string.IsNullOrEmpty(token.Value))
+        if (token is not null && token.IsValid)
             request.Headers.Add(HttpRequestHeader.Authorization.ToString(), $"Bearer {token.Value}");
 
         return request;
@@ -128,38 +125,45 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// ирсэн хариуны формат зөрсөн гэх мэтчилэн алдаануудын улмаас Exception үүсгэж шалтгааныг мэдэгдэнэ.
     /// </exception>
     /// <returns>
-    /// Серверээс ирсэн хариуг амжилттай авч тухайн зарласан T темплейт класс обьектэд хөрвүүлсэн утгыг буцаана.
+    /// Серверээс ирсэн хариуг амжилттай авч тухайн зарласан T темплейт класс обьектэд хөрвүүлсэн утгыг буцаана. 
     /// </returns>
     public virtual T Request<T>(object? payload = null, HttpMethod? method = null, string? requestUri = null)
     {
-        HttpLastResponse = null;
-
         HttpRequestMessage requestMessage = CreateRequest<T>(requestUri ?? BaseAddress?.ToString(), method, payload);
+
+        HttpStatusCode code = HttpStatusCode.Created;
         string contentString = Task.Run(async () =>
         {
-            HttpResponseMessage responsMessage = await SendAsync(requestMessage);
-            return await responsMessage.Content.ReadAsStringAsync();
+            HttpResponseMessage responseMessage = await SendAsync(requestMessage);
+            code = responseMessage.StatusCode;
+            return await responseMessage.Content.ReadAsStringAsync();
         }).Result;
 
-        using JsonDocument document = JsonDocument.Parse(contentString);
-        if (!document.RootElement.TryGetProperty("code", out JsonElement codeElement)
-            || !document.RootElement.TryGetProperty("status", out JsonElement statusElement))
-            throw new Exception($"{GetType().Name}: Error on Request<T>. Invalid Gerege response! response.content -> {contentString}");
+        if (code == HttpStatusCode.OK)
+        {
+            try
+            {
+                T? result = JsonSerializer.Deserialize<T>(contentString, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
+                if (result is not null) return result;
+            }
+            catch { }
+        }
 
-        string? msg = document.RootElement.TryGetProperty("message", out JsonElement messageElement) ? messageElement.GetString() : null;
-        object? result = document.RootElement.TryGetProperty("result", out JsonElement resultElement) ? JsonSerializer.Deserialize<object>(resultElement.GetRawText()) : null;
+        string error;
+        try
+        {
+            var doc = JsonDocument.Parse(contentString);
+            if (doc.RootElement.TryGetProperty("message", out JsonElement message))
+                error = message.ToString();
+            else
+                error = "Unknown response message from Gerege Server";
+        }
+        catch (Exception ex)
+        {
+            error = $"Error on response: {ex.Message}";
+        }
 
-        HttpLastResponse = new(
-            codeElement.GetInt32(),
-            statusElement.GetString()!,
-            msg ?? "Empty message",
-            result ?? new { }
-        );
-
-        if (!HttpLastResponse.IsSuccess)
-            throw new Exception(HttpLastResponse.Message);
-
-        return JsonSerializer.Deserialize<T>(HttpLastResponse.Result.ToString(), new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull })!;
+        throw new Exception(error);
     }
 
     /// <summary>Cache хүсэлтийн хариу файлуудыг хадгалах хавтас зам.</summary>
@@ -186,9 +190,9 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
     /// </returns>
     public virtual T CacheRequest<T>(object? payload = null, HttpMethod? method = null, string? requestUri = null)
     {
-        if (payload is null) Request<T>(payload, method, requestUri);
+        if (payload is null) return Request<T>(payload, method, requestUri);
 
-        GeregeCache cache = new(payload!, CachePath);
+        GeregeCache cache = new(payload, CachePath);
         try
         {
             return cache.Load<T>();
@@ -196,7 +200,6 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
         catch { /* Cache байхгүй эсвэл уншиж чадаагүй */ }
 
         T result = Request<T>(payload, method, requestUri);
-
         bool cacheCreated = false;
         try
         {
@@ -208,7 +211,6 @@ public abstract class GeregeClient : System.Net.Http.HttpClient
             if (!cacheCreated && cache.Exists())
                 File.Delete(cache.FilePath);
         }
-
         return result;
     }
 }

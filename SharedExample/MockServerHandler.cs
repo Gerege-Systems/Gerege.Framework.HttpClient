@@ -28,16 +28,14 @@ public sealed class MockServerHandler : HttpMessageHandler
                 throw new("Unknown route pattern [" + requestTarget + "]");
 
             Task<string>? input = request.Content?.ReadAsStringAsync(cancellationToken);
-            return input is null ? throw new("Invalid input!") : HandleMessages(JsonSerializer.Deserialize<JsonElement>(input.Result));
+            return input?.Result is null || input?.Result == "null"
+                ? throw new("Invalid input!") : HandleMessages(JsonSerializer.Deserialize<JsonElement>(input!.Result));
         }
         catch (Exception ex)
         {
             return Respond(new
             {
-                code = 404,
-                status = "Error 404",
                 message = ex.Message,
-                result = new { }
             },
             HttpStatusCode.NotFound);
         }
@@ -59,15 +57,9 @@ public sealed class MockServerHandler : HttpMessageHandler
         else if(get.ToString() == "title")
             return Respond(new
             {
-                code = 200,
-                status = "success",
-                message = "",
-                result = new
-                {
-                    title = "Gerege System-д тавтай морил"
-                }
+                title = "Gerege System-д тавтай морил."
             });
-        
+
         throw new("Unknown message");
     }
 }

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="MainWindow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Gerege.Framework.HttpClient\Gerege.Framework.HttpClient.csproj" />
   </ItemGroup>
   
